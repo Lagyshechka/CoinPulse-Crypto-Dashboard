@@ -26,10 +26,10 @@ public class Coin
     public long? TotalVolume { get; set; }
     
     [JsonPropertyName("high_24h")]
-    public decimal? High24h { get; set; }
+    public decimal? High24H { get; set; }
     
     [JsonPropertyName("low_24h")]
-    public decimal? Low24h { get; set; }
+    public decimal? Low24H { get; set; }
     
     [JsonPropertyName("price_change_percentage_24h")]
     public double? PriceChangePercentage24H { get; set; }

@@ -20,8 +20,8 @@ public class CoinViewModel : ObservableObject
     public double PriceChangePercentage24H => Model.PriceChangePercentage24H ?? 0;
     
     
-    public decimal High24h => Model.High24h ?? 0;
-    public decimal Low24h => Model.Low24h ?? 0;
+    public decimal High24H => Model.High24H ?? 0;
+    public decimal Low24H => Model.Low24H ?? 0;
     public long MarketCap => Model.MarketCap ?? 0;
     public long TotalVolume => Model.TotalVolume ?? 0;
     

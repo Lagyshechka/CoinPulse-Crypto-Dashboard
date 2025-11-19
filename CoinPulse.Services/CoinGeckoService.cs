@@ -15,7 +15,6 @@ public class CoinGeckoService : ICoinService
     {
         _httpClient = httpClient;
         _dbContext = new AppDbContext();
-        
         _dbContext.Database.EnsureCreated();
     }
 
@@ -58,6 +57,10 @@ public class CoinGeckoService : ICoinService
                     existingCoin.ImageUrl = coin.ImageUrl;
                     existingCoin.Name = coin.Name;
                     existingCoin.Symbol = coin.Symbol;
+                    
+                    existingCoin.High24H = coin.High24H;
+                    existingCoin.Low24H = coin.Low24H;
+                    existingCoin.TotalVolume = coin.TotalVolume;
                 }
                 else
                 {
