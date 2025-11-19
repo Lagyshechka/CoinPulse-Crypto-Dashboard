@@ -11,11 +11,14 @@ using CoinPulse.UI.Services;
 
 namespace CoinPulse.UI;
 
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject, IDisposable
 {
     private readonly ICoinService _coinService;
     private readonly IDispatchedService _dispatchedService;
     private readonly INavigationService _navigationService;
+    
+    private readonly System.Timers.Timer _refreshTimer;
+    private const int RefreshIntervalMs = 20000;
     
     private List<CoinViewModel> _allCoins = new(); 
     
@@ -25,6 +28,8 @@ public partial class MainViewModel : ObservableObject
     
     [ObservableProperty] private CoinViewModel? _selectedCoin;
 
+    [ObservableProperty] private bool _isAutoRefreshEnabled;
+
     public ObservableCollection<CoinViewModel> Coins { get; } = new();
 
     public MainViewModel(ICoinService coinService, INavigationService navigationService, IDispatchedService dispatchedService)
@@ -32,10 +37,30 @@ public partial class MainViewModel : ObservableObject
         _coinService = coinService;
         _navigationService = navigationService;
         _dispatchedService = dispatchedService;
-        if (Application.Current?.Dispatcher != null)
+        
+        _refreshTimer = new System.Timers.Timer(RefreshIntervalMs);
+        _refreshTimer.Elapsed += OnTimerElapsed;
+        
+        Task.Run(LoadData);
+    }
+
+    partial void OnIsAutoRefreshEnabledChanged(bool value)
+    {
+        if (value)
         {
-            Task.Run(LoadData);
+            _refreshTimer.Start();
+            StatusMessage = "Auto-refresh enabled";
         }
+        else
+        {
+            _refreshTimer.Stop();
+            StatusMessage = "Auto-refresh disabled";
+        }
+    }
+
+    private void OnTimerElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        Task.Run(LoadData);
     }
 
     [RelayCommand]
@@ -104,5 +129,10 @@ public partial class MainViewModel : ObservableObject
         {
             IsLoading = false;
         }
+    }
+
+    public void Dispose()
+    {
+        _refreshTimer?.Dispose();
     }
 }
