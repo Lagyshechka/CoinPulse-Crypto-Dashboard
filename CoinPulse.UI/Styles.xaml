@@ -42,7 +42,7 @@
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="#333333"/>
-                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource SecondaryBrush}"/>
                             <Setter TargetName="Border" Property="BorderThickness" Value="1"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
