@@ -7,12 +7,14 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CoinPulse.Services;
+using CoinPulse.UI.Services;
 
 namespace CoinPulse.UI;
 
 public partial class MainViewModel : ObservableObject
 {
     private readonly ICoinService _coinService;
+    private readonly INavigationService _navigationService;
 
     private List<CoinViewModel> _allCoins = new(); 
     
@@ -23,20 +25,20 @@ public partial class MainViewModel : ObservableObject
 
     public ObservableCollection<CoinViewModel> Coins { get; } = new();
 
-    public MainViewModel(ICoinService coinService)
+    public MainViewModel(ICoinService coinService, INavigationService navigationService)
     {
         _coinService = coinService;
+        _navigationService = navigationService;
         Task.Run(LoadData);
     }
 
     [RelayCommand]
     private void OpenDetails(CoinViewModel? coin)
     {
-        if (coin == null) return;
+        var target = coin ?? SelectedCoin;
         
-        var detailWindow = new CoinDetailWindow(coin);
-        detailWindow.Owner = Application.Current.MainWindow;
-        detailWindow.ShowDialog();
+        if (target == null) return;
+        _navigationService.OpenCoinDetails(target);
     }
 
     partial void OnSearchTextChanged(string value)

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using CoinPulse.Services;
+using CoinPulse.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
@@ -30,6 +31,8 @@ namespace CoinPulse.UI
 
             services.AddTransient<MainWindow>();
             services.AddTransient<MainViewModel>();
+
+            services.AddSingleton<INavigationService, NavigationService>();
 
             services.AddHttpClient<ICoinService, CoinGeckoService>()
                 .AddPolicyHandler(HttpPolicyExtensions

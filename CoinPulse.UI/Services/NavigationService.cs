@@ -1,0 +1,18 @@
+﻿using System.Windows;
+
+namespace CoinPulse.UI.Services;
+
+public class NavigationService : INavigationService
+{
+    public void OpenCoinDetails(CoinViewModel coin)
+    {
+        var detailWindow = new CoinDetailWindow(coin);
+
+        if (Application.Current.MainWindow != null)
+        {
+            detailWindow.Owner = Application.Current.MainWindow;
+        }
+        
+        detailWindow.ShowDialog();
+    }
+}
