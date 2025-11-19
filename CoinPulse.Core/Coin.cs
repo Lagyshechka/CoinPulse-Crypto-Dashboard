@@ -1,0 +1,29 @@
+﻿using System.Text.Json.Serialization;
+
+namespace CoinPulse.Core;
+
+public class Coin
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+    
+    [JsonPropertyName("symbol")]
+    public string Symbol { get; set; } = string.Empty;
+    
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+    
+    [JsonPropertyName("image")]
+    public string ImageUrl { get; set; } = string.Empty;
+
+    [JsonPropertyName("current_price")]
+    public decimal? CurrentPrice { get; set; }
+
+    [JsonPropertyName("market_cap")]
+    public long? MarketCap { get; set; }
+    
+    [JsonPropertyName("price_change_percentage_24h")]
+    public double? PriceChangePercentage24H { get; set; }
+
+    [JsonIgnore] public string PriceChangeColor => (PriceChangePercentage24H ?? 0) >= 0 ? "#4CAF50" : "#F44336";
+}
