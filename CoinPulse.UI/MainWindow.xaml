@@ -7,15 +7,15 @@
         xmlns:local="clr-namespace:CoinPulse.UI"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
-        Title="CoinPulse Dashboard" Height="600" Width="1000"
-        Background="#1E1E1E" Foreground="White"
+        Title="CoinPulse Dashboard" Height="700" Width="1100"
+        Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextPrimaryBrush}"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <local:WidthConverter x:Key="WidthConverter"/>
     </Window.Resources>
 
-    <Grid Margin="20">
+    <Grid Margin="25">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -23,49 +23,86 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Grid Grid.Row="0" Margin="0,0,0,20">
+        <Grid Grid.Row="0" Margin="0,0,0,25">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                <TextBlock Text="CoinPulse" FontSize="28" FontWeight="Bold" Foreground="#00C853"/>
-                <TextBlock Text="Real-time Crypto Market" FontSize="14" Foreground="#AAAAAA"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="⚡" FontSize="28" Margin="0,0,10,0"/>
+                    <TextBlock Text="CoinPulse" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </StackPanel>
+                <TextBlock Text="Live Crypto Market Dashboard" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="45,-5,0,0"/>
             </StackPanel>
             
-            <Button Grid.Column="1" Content="REFRESH" Command="{Binding LoadDataCommand}"
-                    Padding="20,10" Background="#2196F3" Foreground="White" 
-                    FontWeight="Bold" BorderThickness="0" Cursor="Hand">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="5"/>
+            <Button Grid.Column="1" Command="{Binding LoadDataCommand}"
+                    Padding="25,10" Background="#2196F3" Foreground="White" 
+                    FontWeight="SemiBold" BorderThickness="0" Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.9"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Opacity" Value="0.7"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
-                </Button.Resources>
+                </Button.Style>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="↻" Margin="0,0,8,0" FontSize="16"/>
+                    <TextBlock Text="REFRESH"/>
+                </StackPanel>
             </Button>
         </Grid>
 
         <!-- Coin List -->
         <ListView Grid.Row="1" ItemsSource="{Binding Coins}" 
                   Background="Transparent" BorderThickness="0"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ItemContainerStyle="{StaticResource CoinListViewItemStyle}">
+            
+            <ListView.Resources>
+                <Style TargetType="ScrollBar" BasedOn="{StaticResource DarkScrollBarStyle}"/>
+            </ListView.Resources>
+
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="#2D2D2D" CornerRadius="10" Padding="15" Margin="0,0,0,10" Width="920">
+                    <Border Background="{StaticResource SurfaceLightBrush}" CornerRadius="12" Padding="15" 
+                            Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ListView}, Converter={StaticResource WidthConverter}, ConverterParameter=30}">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"/>  <!-- Icon -->
-                                <ColumnDefinition Width="150"/> <!-- Name -->
-                                <ColumnDefinition Width="*"/>   <!-- Sparkline Chart -->
-                                <ColumnDefinition Width="120"/> <!-- Price -->
-                                <ColumnDefinition Width="100"/> <!-- Change -->
+                                <ColumnDefinition Width="60"/>  
+                                <ColumnDefinition Width="2*"/>  
+                                <ColumnDefinition Width="3*"/>  
+                                <ColumnDefinition Width="1.5*"/> 
+                                <ColumnDefinition Width="1.2*"/> 
                             </Grid.ColumnDefinitions>
 
-                            <Image Source="{Binding ImageUrl}" Width="32" Height="32" VerticalAlignment="Center"/>
+                            <!-- Icon -->
+                            <Border Width="40" Height="40" CornerRadius="20" Background="White" HorizontalAlignment="Left">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="10" Opacity="0.2" ShadowDepth="2"/>
+                                </Border.Effect>
+                                <Image Source="{Binding ImageUrl}" Width="40" Height="40"/>
+                            </Border>
                             
-                            <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="{Binding Symbol}" Foreground="Gray" FontSize="12"/>
+                            <!-- Name & Symbol -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="{Binding Symbol}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" FontWeight="Bold"/>
                             </StackPanel>
 
                             <!-- Sparkline Chart -->
@@ -74,15 +111,20 @@
                                                 XAxes="{Binding XAxes}"
                                                 YAxes="{Binding YAxes}"
                                                 Height="50"
-                                                Margin="20,0"
+                                                Margin="10,0"
                                                 IsHitTestVisible="False"/>
 
+                            <!-- Price -->
                             <TextBlock Grid.Column="3" Text="{Binding CurrentPrice, StringFormat='${0:N2}'}" 
-                                       FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,20,0"/>
+                                       FontSize="18" FontWeight="Medium" VerticalAlignment="Center" HorizontalAlignment="Right" 
+                                       Margin="0,0,20,0" Foreground="{StaticResource TextPrimaryBrush}"/>
 
-                            <TextBlock Grid.Column="4" Text="{Binding PriceChangePercentage24H, StringFormat='{}{0:N2}%'}" 
-                                       Foreground="{Binding PriceChangeColor}"
-                                       FontSize="16" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                            <!-- Change 24h (Badge style) -->
+                            <Border Grid.Column="4" Background="{Binding PriceChangeBackground}" CornerRadius="6" Padding="8,4" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding PriceChangePercentage24H, StringFormat='{}{0:N2}%'}" 
+                                           Foreground="{Binding PriceChangeColor}"
+                                           FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                            </Border>
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -90,10 +132,11 @@
         </ListView>
 
         <!-- Footer Status -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,15,0,0">
-            <TextBlock Text="Status: " Foreground="Gray"/>
-            <TextBlock Text="{Binding StatusMessage}" FontWeight="Bold" Margin="5,0,0,0"/>
-            <ProgressBar Width="100" Height="10" Margin="20,0,0,0" IsIndeterminate="True" 
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Right">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
+            <ProgressBar Width="100" Height="4" Margin="15,0,0,0" IsIndeterminate="True" 
+                         Background="{StaticResource SurfaceLightBrush}" BorderThickness="0"
+                         Foreground="{StaticResource SecondaryBrush}"
                          Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </StackPanel>
     </Grid>

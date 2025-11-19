@@ -1,4 +1,6 @@
-﻿using CoinPulse.Core;
+﻿using System.Linq;
+using System.Collections.Generic;
+using CoinPulse.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
@@ -18,6 +20,8 @@ public class CoinViewModel : ObservableObject
     public double PriceChangePercentage24H => Model.PriceChangePercentage24H ?? 0;
 
     public string PriceChangeColor => PriceChangePercentage24H >= 0 ? "#4CAF50" : "#F44336";
+    
+    public string PriceChangeBackGround => PriceChangePercentage24H >= 0 ? "#1A4CAF50" : "#1AF44336";
 
     public ISeries[] ChartSeries { get; }
     public Axis[] XAxes { get; }
