@@ -19,6 +19,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private string _statusMessage = "Ready to update";
     [ObservableProperty] private string _searchText = string.Empty;
+    [ObservableProperty] private CoinViewModel? _selectedCoin;
 
     public ObservableCollection<CoinViewModel> Coins { get; } = new();
 
@@ -26,6 +27,16 @@ public partial class MainViewModel : ObservableObject
     {
         _coinService = coinService;
         Task.Run(LoadData);
+    }
+
+    [RelayCommand]
+    private void OpenDetails(CoinViewModel? coin)
+    {
+        if (coin == null) return;
+        
+        var detailWindow = new CoinDetailWindow(coin);
+        detailWindow.Owner = Application.Current.MainWindow;
+        detailWindow.ShowDialog();
     }
 
     partial void OnSearchTextChanged(string value)

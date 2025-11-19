@@ -1,0 +1,119 @@
+﻿<Window x:Class="CoinPulse.UI.CoinDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        xmlns:local="clr-namespace:CoinPulse.UI"
+        d:DataContext="{d:DesignInstance Type=local:CoinViewModel}"
+        mc:Ignorable="d"
+        Title="{Binding Name}" Height="450" Width="700"
+        Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextPrimaryBrush}"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="*"/>    <!-- Chart -->
+            <RowDefinition Height="Auto"/> <!-- Stats Grid -->
+            <RowDefinition Height="Auto"/> <!-- Close Button -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Column="0" Source="{Binding ImageUrl}" Width="64" Height="64" Margin="0,0,20,0"/>
+            
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Name}" FontSize="28" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Symbol}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="16"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock Text="{Binding CurrentPrice, StringFormat='${0:N2}'}" FontSize="32" FontWeight="Bold" HorizontalAlignment="Right"/>
+                <Border Background="{Binding PriceChangeBackground}" CornerRadius="6" Padding="8,4" HorizontalAlignment="Right" Margin="0,5,0,0">
+                    <TextBlock Text="{Binding PriceChangePercentage24H, StringFormat='{}{0:N2}%'}" 
+                               Foreground="{Binding PriceChangeColor}" FontWeight="Bold"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <!-- Chart (Bigger) -->
+        <Border Grid.Row="1" Background="{StaticResource SurfaceLightBrush}" CornerRadius="15" Padding="20" Margin="0,0,0,20">
+             <lvc:CartesianChart Series="{Binding ChartSeries}"
+                                 XAxes="{Binding XAxes}"
+                                 YAxes="{Binding YAxes}"
+                                 TooltipPosition="Hidden"/>
+        </Border>
+
+        <!-- Stats Grid -->
+        <Grid Grid.Row="2" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Helper Style for Labels -->
+            <Grid.Resources>
+                <Style TargetType="TextBlock" x:Key="LabelStyle">
+                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                    <Setter Property="FontSize" Value="12"/>
+                    <Setter Property="Margin" Value="0,0,0,5"/>
+                </Style>
+                <Style TargetType="TextBlock" x:Key="ValueStyle">
+                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                </Style>
+            </Grid.Resources>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="24h High" Style="{StaticResource LabelStyle}"/>
+                <TextBlock Text="{Binding High24H, StringFormat='${0:N2}'}" Style="{StaticResource ValueStyle}"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="24h Low" Style="{StaticResource LabelStyle}"/>
+                <TextBlock Text="{Binding Low24H, StringFormat='${0:N2}'}" Style="{StaticResource ValueStyle}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Market Cap" Style="{StaticResource LabelStyle}"/>
+                <TextBlock Text="{Binding MarketCap, StringFormat='${0:N0}'}" Style="{StaticResource ValueStyle}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="3">
+                <TextBlock Text="Volume" Style="{StaticResource LabelStyle}"/>
+                <TextBlock Text="{Binding TotalVolume, StringFormat='${0:N0}'}" Style="{StaticResource ValueStyle}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Close Button -->
+        <Button Grid.Row="3" Content="CLOSE" IsCancel="True"
+                HorizontalAlignment="Center" Width="150" Padding="10"
+                Background="{StaticResource SurfaceLightBrush}" Foreground="{StaticResource TextPrimaryBrush}"
+                BorderThickness="0" Cursor="Hand">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Button.Style>
+        </Button>
+    </Grid>
+</Window>

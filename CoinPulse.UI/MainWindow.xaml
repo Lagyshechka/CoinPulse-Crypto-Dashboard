@@ -65,6 +65,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Header -->
         <Grid Grid.Row="0" Margin="0,0,0,25">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -115,15 +116,19 @@
             </Button>
         </Grid>
 
+        <!-- Coin List -->
+        <!-- ИСПРАВЛЕНИЕ: Добавлено событие MouseDoubleClick -->
         <ListView Grid.Row="1" ItemsSource="{Binding Coins}" 
                   Background="Transparent" BorderThickness="0"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  ItemContainerStyle="{StaticResource CoinListViewItemStyle}">
+                  ItemContainerStyle="{StaticResource CoinListViewItemStyle}"
+                  SelectedItem="{Binding SelectedCoin}"
+                  MouseDoubleClick="ListView_MouseDoubleClick"> 
             
             <ListView.Resources>
                 <Style TargetType="ScrollBar" BasedOn="{StaticResource DarkScrollBarStyle}"/>
             </ListView.Resources>
-
+            
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Border Background="{StaticResource SurfaceLightBrush}" CornerRadius="12" Padding="15" 
@@ -172,6 +177,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
+        <!-- Footer Status -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,15,0,0" HorizontalAlignment="Right">
             <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
             <ProgressBar Width="100" Height="4" Margin="15,0,0,0" IsIndeterminate="True" 

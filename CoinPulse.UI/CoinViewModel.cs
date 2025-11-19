@@ -18,6 +18,13 @@ public class CoinViewModel : ObservableObject
     public string ImageUrl => Model.ImageUrl;
     public decimal CurrentPrice => Model.CurrentPrice ?? 0;
     public double PriceChangePercentage24H => Model.PriceChangePercentage24H ?? 0;
+    
+    
+    public decimal High24h => Model.High24h ?? 0;
+    public decimal Low24h => Model.Low24h ?? 0;
+    public long MarketCap => Model.MarketCap ?? 0;
+    public long TotalVolume => Model.TotalVolume ?? 0;
+    
 
     public string PriceChangeColor => PriceChangePercentage24H >= 0 ? "#4CAF50" : "#F44336";
     
@@ -54,7 +61,7 @@ public class CoinViewModel : ObservableObject
                 Values = values,
                 Fill = null,
                 GeometrySize = 0,
-                Stroke = new SolidColorPaint(skColor) { StrokeThickness = 2 },
+                Stroke = new SolidColorPaint(skColor) { StrokeThickness = 3 },
                 LineSmoothness = 0.5
             }
         };
