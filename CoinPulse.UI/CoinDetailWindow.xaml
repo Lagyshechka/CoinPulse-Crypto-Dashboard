@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:CoinPulse.UI"
         d:DataContext="{d:DesignInstance Type=local:CoinViewModel}"
         mc:Ignorable="d"
-        Title="{Binding Name}" Height="450" Width="700"
+        Title="{Binding Name}" Height="550" Width="700"
         Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextPrimaryBrush}"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
@@ -17,6 +17,7 @@
             <RowDefinition Height="Auto"/> <!-- Header -->
             <RowDefinition Height="*"/>    <!-- Chart -->
             <RowDefinition Height="Auto"/> <!-- Stats Grid -->
+            <RowDefinition Height="Auto"/> <!-- Portfolio Section -->
             <RowDefinition Height="Auto"/> <!-- Close Button -->
         </Grid.RowDefinitions>
 
@@ -44,7 +45,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- Chart (Bigger) -->
+        <!-- Chart -->
         <Border Grid.Row="1" Background="{StaticResource SurfaceLightBrush}" CornerRadius="15" Padding="20" Margin="0,0,0,20">
              <lvc:CartesianChart Series="{Binding ChartSeries}"
                                  XAxes="{Binding XAxes}"
@@ -61,7 +62,6 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Helper Style for Labels -->
             <Grid.Resources>
                 <Style TargetType="TextBlock" x:Key="LabelStyle">
                     <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
@@ -96,8 +96,35 @@
             </StackPanel>
         </Grid>
 
+        <Border Grid.Row="3" Background="{StaticResource SurfaceLightBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Your Holdings" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,5"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" 
+                                 Width="120" FontSize="20" FontWeight="Bold" Padding="5"
+                                 Background="#1E1E1E" Foreground="White" BorderThickness="0"/>
+                        <TextBlock Text="{Binding Symbol}" Foreground="{StaticResource TextSecondaryBrush}" 
+                                   FontSize="16" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock Text="Total Value" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,5" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding HeldValue, StringFormat='${0:N2}'}" 
+                               FontSize="24" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Right"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <!-- Close Button -->
-        <Button Grid.Row="3" Content="CLOSE" IsCancel="True"
+        <Button Grid.Row="4" Content="CLOSE" IsCancel="True"
                 HorizontalAlignment="Center" Width="150" Padding="10"
                 Background="{StaticResource SurfaceLightBrush}" Foreground="{StaticResource TextPrimaryBrush}"
                 BorderThickness="0" Cursor="Hand">

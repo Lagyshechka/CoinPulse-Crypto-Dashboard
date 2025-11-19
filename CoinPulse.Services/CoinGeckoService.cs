@@ -29,7 +29,7 @@ public class CoinGeckoService : ICoinService
             if (response != null && response.Count > 0)
             {
                 await UpdateLocalCacheAsync(response, token);
-                return response;
+                return await _dbContext.Coins.AsNoTracking().ToListAsync(token);
             }
         }
         catch (Exception)
@@ -38,6 +38,16 @@ public class CoinGeckoService : ICoinService
         }
         
         return await _dbContext.Coins.AsNoTracking().ToListAsync(token);
+    }
+
+    public async Task UpdateUserCoinAsync(Coin coin)
+    {
+        var existing = await _dbContext.Coins.FirstOrDefaultAsync(c => c.Id == coin.Id);
+        if (existing != null)
+        {
+            existing.Amount = coin.Amount;
+            await _dbContext.SaveChangesAsync();
+        }
     }
 
     private async Task UpdateLocalCacheAsync(List<Coin> newCoins, CancellationToken token)
@@ -57,7 +67,6 @@ public class CoinGeckoService : ICoinService
                     existingCoin.ImageUrl = coin.ImageUrl;
                     existingCoin.Name = coin.Name;
                     existingCoin.Symbol = coin.Symbol;
-                    
                     existingCoin.High24H = coin.High24H;
                     existingCoin.Low24H = coin.Low24H;
                     existingCoin.TotalVolume = coin.TotalVolume;

@@ -36,6 +36,9 @@ public class Coin
     
     [JsonPropertyName("sparkline_in_7d")]
     public SparklineData? SparklineIn7D { get; set; }
+    
+    [JsonIgnore]
+    public decimal Amount { get; set; }
 }
 
 public class SparklineData

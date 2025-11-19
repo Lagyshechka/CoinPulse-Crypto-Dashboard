@@ -5,4 +5,6 @@ namespace CoinPulse.Services;
 public interface ICoinService
 {
     Task<List<Coin>> GetTopCoinsAsync(CancellationToken token = default);
+
+    Task UpdateUserCoinAsync(Coin coin);
 }

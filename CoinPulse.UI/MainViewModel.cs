@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,8 +28,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _searchText = string.Empty;
     
     [ObservableProperty] private CoinViewModel? _selectedCoin;
-
     [ObservableProperty] private bool _isAutoRefreshEnabled;
+
+    [ObservableProperty] private decimal _totalPortfolioValue;
 
     public ObservableCollection<CoinViewModel> Coins { get; } = new();
 
@@ -40,8 +42,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
         
         _refreshTimer = new System.Timers.Timer(RefreshIntervalMs);
         _refreshTimer.Elapsed += OnTimerElapsed;
-        
-        Task.Run(LoadData);
+    }
+
+    private void OnCoinViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(CoinViewModel.Amount))
+        {
+            RecalculateTotalValue();
+
+            if (sender is CoinViewModel vm)
+            {
+                Task.Run(() => _coinService.UpdateUserCoinAsync(vm.Model));
+            }
+        }
+    }
+
+    private void RecalculateTotalValue()
+    {
+        TotalPortfolioValue = _allCoins.Sum(c => c.HeldValue);
     }
 
     partial void OnIsAutoRefreshEnabledChanged(bool value)
@@ -115,8 +133,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             _dispatchedService.Invoke(() =>
             {
+                foreach (var coin in _allCoins)
+                    coin.PropertyChanged -= OnCoinViewModelPropertyChanged;
+                
                 _allCoins = result.Select(c => new CoinViewModel(c)).ToList();
+
+                foreach (var coin in _allCoins)
+                    coin.PropertyChanged += OnCoinViewModelPropertyChanged;
+                
                 FilterCoins();
+                RecalculateTotalValue();
             });
 
             StatusMessage = $"Updated: {DateTime.Now:HH:mm:ss}";
@@ -134,5 +160,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _refreshTimer?.Dispose();
+        foreach(var coin in _allCoins)
+            coin.PropertyChanged -= OnCoinViewModelPropertyChanged;
     }
 }

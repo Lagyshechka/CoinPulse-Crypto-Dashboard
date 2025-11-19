@@ -24,8 +24,23 @@ public class CoinViewModel : ObservableObject
     public decimal Low24H => Model.Low24H ?? 0;
     public long MarketCap => Model.MarketCap ?? 0;
     public long TotalVolume => Model.TotalVolume ?? 0;
-    
 
+    public decimal Amount
+    {
+        get => Model.Amount;
+        set
+        {
+            if (Model.Amount != value)
+            {
+                Model.Amount = value;
+                OnPropertyChanged(nameof(Amount));
+                OnPropertyChanged(nameof(HeldValue));
+            }
+        }
+    }
+
+    public decimal HeldValue => Amount * (Model.CurrentPrice ?? 0);
+    
     public string PriceChangeColor => PriceChangePercentage24H >= 0 ? "#4CAF50" : "#F44336";
     
     public string PriceChangeBackGround => PriceChangePercentage24H >= 0 ? "#1A4CAF50" : "#1AF44336";

@@ -9,6 +9,8 @@ namespace CoinPulse.UI
         {
             InitializeComponent();
             DataContext = viewModel;
+
+            Loaded += async (s, e) => await viewModel.LoadData();
         }
 
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
