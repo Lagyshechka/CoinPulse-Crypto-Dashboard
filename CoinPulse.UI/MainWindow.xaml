@@ -3,24 +3,30 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         xmlns:local="clr-namespace:CoinPulse.UI"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
-        Title="CoinPulse Dashboard" Height="600" Width="900"
+        Title="CoinPulse Dashboard" Height="600" Width="1000"
         Background="#1E1E1E" Foreground="White"
         WindowStartupLocation="CenterScreen">
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <!-- Header -->
-            <RowDefinition Height="*"/>    <!-- Content -->
-            <RowDefinition Height="Auto"/> <!-- Footer -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Header -->
         <Grid Grid.Row="0" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>    
-                <ColumnDefinition Width="Auto"/> 
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" VerticalAlignment="Center">
@@ -30,22 +36,28 @@
             
             <Button Grid.Column="1" Content="REFRESH" Command="{Binding LoadDataCommand}"
                     Padding="20,10" Background="#2196F3" Foreground="White" 
-                    FontWeight="Bold" BorderThickness="0" Cursor="Hand"
-                    VerticalAlignment="Center"/>
+                    FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
         </Grid>
 
-        <!-- Content List -->
+        <!-- Coin List -->
         <ListView Grid.Row="1" ItemsSource="{Binding Coins}" 
                   Background="Transparent" BorderThickness="0"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="#2D2D2D" CornerRadius="10" Padding="15" Margin="0,0,0,10" Width="800">
+                    <Border Background="#2D2D2D" CornerRadius="10" Padding="15" Margin="0,0,0,10" Width="920">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="50"/>  <!-- Icon -->
-                                <ColumnDefinition Width="*"/>   <!-- Name -->
-                                <ColumnDefinition Width="Auto"/> <!-- Price -->
+                                <ColumnDefinition Width="150"/> <!-- Name -->
+                                <ColumnDefinition Width="*"/>   <!-- Sparkline Chart -->
+                                <ColumnDefinition Width="120"/> <!-- Price -->
                                 <ColumnDefinition Width="100"/> <!-- Change -->
                             </Grid.ColumnDefinitions>
 
@@ -53,13 +65,22 @@
                             
                             <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="{Binding Symbol, StringFormat='{}{0}'}" Foreground="Gray" FontSize="12"/>
+                                <TextBlock Text="{Binding Symbol}" Foreground="Gray" FontSize="12"/>
                             </StackPanel>
 
-                            <TextBlock Grid.Column="2" Text="{Binding CurrentPrice, StringFormat='${0:N2}'}" 
-                                       FontSize="18" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                            <!-- Sparkline Chart -->
+                            <lvc:CartesianChart Grid.Column="2" 
+                                                Series="{Binding ChartSeries}"
+                                                XAxes="{Binding XAxes}"
+                                                YAxes="{Binding YAxes}"
+                                                Height="50"
+                                                Margin="20,0"
+                                                IsHitTestVisible="False"/>
 
-                            <TextBlock Grid.Column="3" Text="{Binding PriceChangePercentage24H, StringFormat='{}{0:N2}%'}" 
+                            <TextBlock Grid.Column="3" Text="{Binding CurrentPrice, StringFormat='${0:N2}'}" 
+                                       FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,20,0"/>
+
+                            <TextBlock Grid.Column="4" Text="{Binding PriceChangePercentage24H, StringFormat='{}{0:N2}%'}" 
                                        Foreground="{Binding PriceChangeColor}"
                                        FontSize="16" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                         </Grid>
@@ -68,18 +89,12 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <!-- Footer / Status -->
+        <!-- Footer Status -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,15,0,0">
             <TextBlock Text="Status: " Foreground="Gray"/>
             <TextBlock Text="{Binding StatusMessage}" FontWeight="Bold" Margin="5,0,0,0"/>
-            
-            <ProgressBar Width="100" Height="10" Margin="20,0,0,0" 
-                         IsIndeterminate="True" 
+            <ProgressBar Width="100" Height="10" Margin="20,0,0,0" IsIndeterminate="True" 
                          Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </StackPanel>
     </Grid>
-    
-    <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    </Window.Resources>
 </Window>

@@ -24,6 +24,13 @@ public class Coin
     
     [JsonPropertyName("price_change_percentage_24h")]
     public double? PriceChangePercentage24H { get; set; }
+    
+    [JsonPropertyName("sparkline_in_7d")]
+    public SparklineData? SparklineIn7D { get; set; }
+}
 
-    [JsonIgnore] public string PriceChangeColor => (PriceChangePercentage24H ?? 0) >= 0 ? "#4CAF50" : "#F44336";
+public class SparklineData
+{
+    [JsonPropertyName("price")]
+    public List<double>? Price { get; set; }
 }

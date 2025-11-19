@@ -1,12 +1,13 @@
 ﻿using System.Windows;
 
-namespace CoinPulse.UI;
-
-public partial class MainWindow : Window
+namespace CoinPulse.UI
 {
-    public MainWindow(MainViewModel viewModel)
+    public partial class MainWindow : Window
     {
-        InitializeComponent();
-        DataContext = viewModel;
+        public MainWindow(MainViewModel viewModel)
+        {
+            InitializeComponent();
+            DataContext = viewModel;
+        }
     }
-}
+}    

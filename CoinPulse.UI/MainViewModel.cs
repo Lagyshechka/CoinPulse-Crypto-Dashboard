@@ -13,7 +13,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private string _statusMessage = "Ready to update";
 
-    public ObservableCollection<Coin> Coins { get; } = new();
+    public ObservableCollection<CoinViewModel> Coins { get; } = new();
 
     public MainViewModel(ICoinService coinService)
     {
@@ -25,7 +25,6 @@ public partial class MainViewModel : ObservableObject
     private async Task LoadData()
     {
         if (IsLoading) return;
-
         IsLoading = true;
         StatusMessage = "Fetching data...";
 
@@ -33,14 +32,14 @@ public partial class MainViewModel : ObservableObject
         {
             var result = await _coinService.GetTopCoinsAsync();
 
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 Coins.Clear();
                 foreach (var coin in result)
                 {
-                    Coins.Add(coin);
+                    Coins.Add(new CoinViewModel(coin));
                 }
-            });
+            }));
 
             StatusMessage = $"Updated: {DateTime.Now:HH:mm:ss}";
         }
