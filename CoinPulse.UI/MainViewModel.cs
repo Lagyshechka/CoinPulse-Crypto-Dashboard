@@ -14,26 +14,32 @@ namespace CoinPulse.UI;
 public partial class MainViewModel : ObservableObject
 {
     private readonly ICoinService _coinService;
+    private readonly IDispatchedService _dispatchedService;
     private readonly INavigationService _navigationService;
-
+    
     private List<CoinViewModel> _allCoins = new(); 
     
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private string _statusMessage = "Ready to update";
     [ObservableProperty] private string _searchText = string.Empty;
+    
     [ObservableProperty] private CoinViewModel? _selectedCoin;
 
     public ObservableCollection<CoinViewModel> Coins { get; } = new();
 
-    public MainViewModel(ICoinService coinService, INavigationService navigationService)
+    public MainViewModel(ICoinService coinService, INavigationService navigationService, IDispatchedService dispatchedService)
     {
         _coinService = coinService;
         _navigationService = navigationService;
-        Task.Run(LoadData);
+        _dispatchedService = dispatchedService;
+        if (Application.Current?.Dispatcher != null)
+        {
+            Task.Run(LoadData);
+        }
     }
 
     [RelayCommand]
-    private void OpenDetails(CoinViewModel? coin)
+    public void OpenDetails(CoinViewModel? coin)
     {
         var target = coin ?? SelectedCoin;
         
@@ -48,8 +54,6 @@ public partial class MainViewModel : ObservableObject
 
     private void FilterCoins()
     {
-        if (_allCoins is null || _allCoins.Count == 0) return;
-
         IEnumerable<CoinViewModel> filtered;
 
         if (string.IsNullOrWhiteSpace(SearchText))
@@ -63,7 +67,7 @@ public partial class MainViewModel : ObservableObject
                 c.Symbol.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
         }
 
-        Application.Current.Dispatcher.Invoke(() =>
+        _dispatchedService.Invoke(() =>
         {
             Coins.Clear();
             foreach (var coin in filtered)
@@ -74,7 +78,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task LoadData()
+    public async Task LoadData()
     {
         if (IsLoading) return;
         IsLoading = true;
@@ -84,10 +88,9 @@ public partial class MainViewModel : ObservableObject
         {
             var result = await _coinService.GetTopCoinsAsync();
 
-            Application.Current.Dispatcher.Invoke(() =>
+            _dispatchedService.Invoke(() =>
             {
                 _allCoins = result.Select(c => new CoinViewModel(c)).ToList();
-                
                 FilterCoins();
             });
 

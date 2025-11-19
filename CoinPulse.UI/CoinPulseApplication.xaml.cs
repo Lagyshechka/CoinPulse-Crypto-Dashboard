@@ -33,6 +33,7 @@ namespace CoinPulse.UI
             services.AddTransient<MainViewModel>();
 
             services.AddSingleton<INavigationService, NavigationService>();
+            services.AddSingleton<IDispatchedService, WpfDispatcherService>();
 
             services.AddHttpClient<ICoinService, CoinGeckoService>()
                 .AddPolicyHandler(HttpPolicyExtensions

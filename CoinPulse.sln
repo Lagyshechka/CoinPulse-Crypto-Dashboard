@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinPulse.Services", "CoinP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinPulse.UI", "CoinPulse.UI\CoinPulse.UI.csproj", "{F70C3248-E975-4CD9-AFCE-AE5202B95DA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinPulse.Tests", "CoinPulse.Tests\CoinPulse.Tests.csproj", "{59A6F346-8D7E-42A5-A518-9333B5E9FF67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{F70C3248-E975-4CD9-AFCE-AE5202B95DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F70C3248-E975-4CD9-AFCE-AE5202B95DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F70C3248-E975-4CD9-AFCE-AE5202B95DA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59A6F346-8D7E-42A5-A518-9333B5E9FF67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59A6F346-8D7E-42A5-A518-9333B5E9FF67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59A6F346-8D7E-42A5-A518-9333B5E9FF67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59A6F346-8D7E-42A5-A518-9333B5E9FF67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
