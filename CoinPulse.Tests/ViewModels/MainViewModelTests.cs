@@ -100,4 +100,11 @@ public class MainViewModelTests
 
         _mockNavService.Verify(n => n.OpenCoinDetails(coinVm), Times.Once);
     }
+
+    [Fact]
+    public void OpenPortfolio_ShouldCallNavigationService()
+    {
+        _viewModel.OpenPortfolio();
+        _mockNavService.Verify(n => n.OpenPortfolio(_viewModel), Times.Once);
+    }
 }

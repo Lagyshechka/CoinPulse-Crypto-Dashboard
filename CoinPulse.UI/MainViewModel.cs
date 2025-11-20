@@ -10,6 +10,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CoinPulse.Services;
 using CoinPulse.UI.Services;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 
 namespace CoinPulse.UI;
 
@@ -35,6 +39,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool _isAutoRefreshEnabled;
 
     [ObservableProperty] private decimal _totalPortfolioValue;
+    [ObservableProperty] private ISeries[] _portfolioSeries = Array.Empty<ISeries>();
+
+    public SolidColorPaint LegendTextPaint { get; set; } =
+        new SolidColorPaint
+        {
+            Color = new SKColor(255, 255, 255),
+            SKTypeface = SKTypeface.FromFamilyName("Arial")
+        };
 
     [ObservableProperty] private string _selectedCurrency = "usd";
     public ObservableCollection<string> Currencies { get; } = new() { "usd", "eur", "rub", "uah", "jpy", "gbp", "btc", "eth" };
@@ -107,6 +119,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void RecalculateTotalValue()
     {
         TotalPortfolioValue = _allCoins.Sum(c => c.HeldValue);
+        UpdatePortfolioChart();
+    }
+
+    private void UpdatePortfolioChart()
+    {
+        var holdings = _allCoins.Where(c => c.HeldValue > 0).OrderBy(c => c.HeldValue).ToList();
+
+        if (holdings.Count == 0)
+        {
+            PortfolioSeries = Array.Empty<ISeries>();
+            return;
+        }
+
+        PortfolioSeries = holdings.Select(c => new PieSeries<decimal>
+        {
+            Values = new[] { c.HeldValue },
+            Name = c.Name, 
+            ToolTipLabelFormatter = point => $"{c.Symbol}: {point.PrimaryValue:N2} {CurrentCurrencySymbol}",
+            DataLabelsFormatter = point => $"{point.StackedValue!.Share:P1}", 
+            DataLabelsPaint = new SolidColorPaint(SKColors.White),
+            DataLabelsPosition = LiveChartsCore.Measure.PolarLabelsPosition.Middle,
+            InnerRadius = 50 
+        }).ToArray();
     }
 
     partial void OnIsAutoRefreshEnabledChanged(bool value)
@@ -126,6 +161,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void OnTimerElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
         Task.Run(LoadData);
+    }
+
+    [RelayCommand]
+    public void OpenPortfolio()
+    {
+        _navigationService.OpenPortfolio(this);
     }
 
     [RelayCommand]

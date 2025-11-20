@@ -3,4 +3,6 @@
 public interface INavigationService
 {
     void OpenCoinDetails(CoinViewModel coin);
+    
+    void OpenPortfolio(MainViewModel mainViewModel);
 }
