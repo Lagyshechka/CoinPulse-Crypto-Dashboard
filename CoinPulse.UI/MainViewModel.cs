@@ -39,6 +39,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool _isAutoRefreshEnabled;
 
     [ObservableProperty] private decimal _totalPortfolioValue;
+
+    [ObservableProperty] private double _portfolioChange24H;
+
+    public string PortfolioChangeColor => PortfolioChange24H >= 0 ? "#4CAF50" : "#F44336";
+    public string PortfolioChangeBackground => PortfolioChange24H >= 0 ? "#1A4CAF50" : "#1AF44336";
+    
     [ObservableProperty] private ISeries[] _portfolioSeries = Array.Empty<ISeries>();
 
     public SolidColorPaint LegendTextPaint { get; set; } =
@@ -119,6 +125,25 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void RecalculateTotalValue()
     {
         TotalPortfolioValue = _allCoins.Sum(c => c.HeldValue);
+
+        if (TotalPortfolioValue > 0)
+        {
+            double totalWeightedChange = 0;
+            foreach (var coin in _allCoins.Where(c => c.HeldValue > 0))
+            {
+                totalWeightedChange += (double)coin.HeldValue * coin.PriceChangePercentage24H;
+            }
+            
+            PortfolioChange24H = totalWeightedChange / (double)TotalPortfolioValue;
+        }
+        else
+        {
+            PortfolioChange24H = 0;
+        }
+        
+        OnPropertyChanged(nameof(PortfolioChangeColor));
+        OnPropertyChanged(nameof(PortfolioChangeBackground));
+        
         UpdatePortfolioChart();
     }
 

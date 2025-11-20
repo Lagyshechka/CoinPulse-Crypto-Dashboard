@@ -90,6 +90,23 @@
                                 <Run Text="{Binding CurrentCurrencySymbol, Mode=OneWay}"/>
                                 <Run Text="{Binding TotalPortfolioValue, StringFormat='N2', Mode=OneWay}"/>
                             </TextBlock>
+                            
+                            <Border Background="{Binding PortfolioChangeBackground}" CornerRadius="4" Margin="10,0,0,0" Padding="6,2" VerticalAlignment="Center">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding TotalPortfolioValue}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding PortfolioChange24H, StringFormat='{}{0:P2}'}" 
+                                           Foreground="{Binding PortfolioChangeColor}" 
+                                           FontSize="12" FontWeight="Bold"/>
+                            </Border>
+                            
                             <TextBlock Text="📊" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="16"/>
                         </StackPanel>
                     </Border>
