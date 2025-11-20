@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -19,7 +20,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly INavigationService _navigationService;
     
     private readonly System.Timers.Timer _refreshTimer;
-    private const int RefreshIntervalMs = 20000;
+    private const int RefreshIntervalMs = 60000;
+    
+    private CancellationTokenSource? _loadDataCts;
+    private CancellationTokenSource? _currencyDebounceCts;
     
     private List<CoinViewModel> _allCoins = new(); 
     
@@ -32,6 +36,22 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     [ObservableProperty] private decimal _totalPortfolioValue;
 
+    [ObservableProperty] private string _selectedCurrency = "usd";
+    public ObservableCollection<string> Currencies { get; } = new() { "usd", "eur", "rub", "uah", "jpy", "gbp", "btc", "eth" };
+    
+    public string CurrentCurrencySymbol => SelectedCurrency switch
+    {
+        "usd" => "$",
+        "eur" => "€",
+        "rub" => "₽",
+        "uah" => "₴",
+        "jpy" => "¥",
+        "gbp" => "£",
+        "btc" => "₿",
+        "eth" => "Ξ",
+        _ => SelectedCurrency.ToUpper()
+    };
+
     public ObservableCollection<CoinViewModel> Coins { get; } = new();
 
     public MainViewModel(ICoinService coinService, INavigationService navigationService, IDispatchedService dispatchedService)
@@ -42,6 +62,33 @@ public partial class MainViewModel : ObservableObject, IDisposable
         
         _refreshTimer = new System.Timers.Timer(RefreshIntervalMs);
         _refreshTimer.Elapsed += OnTimerElapsed;
+
+        Task.Run(LoadData);
+    }
+
+    partial void OnSelectedCurrencyChanged(string value)
+    {
+        OnPropertyChanged(nameof(CurrentCurrencySymbol));
+        
+        _currencyDebounceCts?.Cancel();
+        _currencyDebounceCts = new CancellationTokenSource();
+        var token = _currencyDebounceCts.Token;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(1000, token);
+
+                if (token.IsCancellationRequested) return;
+
+                await LoadData();
+            }
+            catch (TaskCanceledException)
+            {
+
+            }
+        });
     }
 
     private void OnCoinViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -123,29 +170,39 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task LoadData()
     {
-        if (IsLoading) return;
+        _loadDataCts?.Cancel();
+        _loadDataCts = new CancellationTokenSource();
+        var token = _loadDataCts.Token;
+        
         IsLoading = true;
         StatusMessage = "Fetching data...";
 
         try
         {
-            var result = await _coinService.GetTopCoinsAsync();
+            var result = await _coinService.GetTopCoinsAsync(SelectedCurrency, token);
+            var symbol = CurrentCurrencySymbol;
+
+            if (token.IsCancellationRequested) return;
 
             _dispatchedService.Invoke(() =>
             {
                 foreach (var coin in _allCoins)
                     coin.PropertyChanged -= OnCoinViewModelPropertyChanged;
-                
-                _allCoins = result.Select(c => new CoinViewModel(c)).ToList();
+
+                _allCoins = result.Select(c => new CoinViewModel(c, symbol)).ToList();
 
                 foreach (var coin in _allCoins)
                     coin.PropertyChanged += OnCoinViewModelPropertyChanged;
-                
+
                 FilterCoins();
                 RecalculateTotalValue();
             });
 
             StatusMessage = $"Updated: {DateTime.Now:HH:mm:ss}";
+        }
+        catch (TaskCanceledException)
+        {
+            
         }
         catch (Exception ex)
         {
@@ -153,13 +210,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         finally
         {
-            IsLoading = false;
+            if (!token.IsCancellationRequested)
+            {
+                IsLoading = false;
+            }
         }
     }
 
     public void Dispose()
     {
         _refreshTimer?.Dispose();
+        _loadDataCts?.Cancel();
+        _currencyDebounceCts?.Cancel();
         foreach(var coin in _allCoins)
             coin.PropertyChanged -= OnCoinViewModelPropertyChanged;
     }

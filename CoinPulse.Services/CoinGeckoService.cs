@@ -18,10 +18,10 @@ public class CoinGeckoService : ICoinService
         _dbContext.Database.EnsureCreated();
     }
 
-    public async Task<List<Coin>> GetTopCoinsAsync(CancellationToken token = default)
+    public async Task<List<Coin>> GetTopCoinsAsync(string currency = "usd", CancellationToken token = default)
     {
         _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "CoinPulseApp/1.0");
-        var url = $"{BaseUrl}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true&price_change_percentage=24h";
+        var url = $"{BaseUrl}/coins/markets?vs_currency={currency}&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h";
         try 
         {
             var response = await _httpClient.GetFromJsonAsync<List<Coin>>(url, token);

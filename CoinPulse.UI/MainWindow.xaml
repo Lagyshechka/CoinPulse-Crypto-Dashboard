@@ -13,6 +13,7 @@
 
     <Window.Resources>
         <local:WidthConverter x:Key="WidthConverter"/>
+        
         <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
             <Setter Property="Background" Value="{StaticResource SurfaceLightBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
@@ -55,6 +56,14 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource SurfaceLightBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="25">
@@ -72,31 +81,36 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Logo & Total Balance -->
             <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,30,0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="⚡" FontSize="28" Margin="0,0,10,0"/>
                     <TextBlock Text="CoinPulse" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                    
                     <Border Background="{StaticResource SurfaceLightBrush}" CornerRadius="8" Margin="30,0,0,0" Padding="15,5">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Portfolio:" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="{Binding TotalPortfolioValue, StringFormat='${0:N2}'}" 
-                                       Foreground="{StaticResource SecondaryBrush}" 
-                                       FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Foreground="{StaticResource SecondaryBrush}" FontSize="20" FontWeight="Bold" VerticalAlignment="Center">
+                                <Run Text="{Binding CurrentCurrencySymbol, Mode=OneWay}"/>
+                                <Run Text="{Binding TotalPortfolioValue, StringFormat='N2', Mode=OneWay}"/> <!-- Добавлено Mode=OneWay -->
+                            </TextBlock>
                         </StackPanel>
                     </Border>
                 </StackPanel>
                 <TextBlock Text="Live Crypto Market Dashboard" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="45,-5,0,0"/>
             </StackPanel>
             
-            <!-- Search Bar -->
             <TextBox Grid.Column="1" Width="300" HorizontalAlignment="Left" VerticalAlignment="Center"
                      Style="{StaticResource SearchTextBoxStyle}"
                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
 
-            <!-- Controls -->
             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                <CheckBox Content="Auto-Refresh (60s)" 
+                
+                <ComboBox ItemsSource="{Binding Currencies}" 
+                          SelectedItem="{Binding SelectedCurrency}"
+                          Width="80" Margin="0,0,15,0" 
+                          Style="{StaticResource DarkComboBoxStyle}"/>
+
+                <CheckBox Content="Auto-Refresh" 
                           IsChecked="{Binding IsAutoRefreshEnabled}"
                           Foreground="{StaticResource TextSecondaryBrush}"
                           VerticalContentAlignment="Center"
@@ -104,7 +118,7 @@
                           Cursor="Hand"/>
 
                 <Button Command="{Binding LoadDataCommand}"
-                        Padding="25,10" Background="#2196F3" Foreground="White" 
+                        Padding="20,10" Background="#2196F3" Foreground="White" 
                         FontWeight="SemiBold" BorderThickness="0" Cursor="Hand">
                     <Button.Style>
                         <Style TargetType="Button">
@@ -160,7 +174,6 @@
                                 <ColumnDefinition Width="1.2*"/> 
                             </Grid.ColumnDefinitions>
 
-                            <!-- Icon -->
                             <Border Width="40" Height="40" CornerRadius="20" Background="White" HorizontalAlignment="Left">
                                 <Border.Effect>
                                     <DropShadowEffect Color="Black" BlurRadius="10" Opacity="0.2" ShadowDepth="2"/>
@@ -168,13 +181,11 @@
                                 <Image Source="{Binding ImageUrl}" Width="40" Height="40"/>
                             </Border>
                             
-                            <!-- Name & Symbol -->
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                                 <TextBlock Text="{Binding Symbol}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" FontWeight="Bold"/>
                             </StackPanel>
 
-                            <!-- Sparkline Chart -->
                             <lvc:CartesianChart Grid.Column="2" 
                                                 Series="{Binding ChartSeries}"
                                                 XAxes="{Binding XAxes}"
@@ -183,12 +194,13 @@
                                                 Margin="10,0"
                                                 IsHitTestVisible="False"/>
 
-                            <!-- Price -->
-                            <TextBlock Grid.Column="3" Text="{Binding CurrentPrice, StringFormat='${0:N2}'}" 
+                            <TextBlock Grid.Column="3" 
                                        FontSize="18" FontWeight="Medium" VerticalAlignment="Center" HorizontalAlignment="Right" 
-                                       Margin="0,0,20,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                       Margin="0,0,20,0" Foreground="{StaticResource TextPrimaryBrush}">
+                                <Run Text="{Binding CurrencySymbol, Mode=OneWay}"/>
+                                <Run Text="{Binding CurrentPrice, StringFormat='N2', Mode=OneWay}"/> 
+                            </TextBlock>
 
-                            <!-- Change 24h -->
                             <Border Grid.Column="4" Background="{Binding PriceChangeBackground}" CornerRadius="6" Padding="8,4" HorizontalAlignment="Right">
                                 <TextBlock Text="{Binding PriceChangePercentage24H, StringFormat='{}{0:N2}%'}" 
                                            Foreground="{Binding PriceChangeColor}"

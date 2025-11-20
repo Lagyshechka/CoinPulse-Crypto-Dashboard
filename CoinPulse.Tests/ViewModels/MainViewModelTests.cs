@@ -35,7 +35,7 @@ public class MainViewModelTests
             new() { Id = "ethereum", Name = "Ethereum", Symbol = "eth", CurrentPrice = 3000 }
         };
 
-        _mockCoinService.Setup(s => s.GetTopCoinsAsync(It.IsAny<CancellationToken>()))
+        _mockCoinService.Setup(s => s.GetTopCoinsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(fakeCoins);
 
         await _viewModel.LoadData();
@@ -57,7 +57,7 @@ public class MainViewModelTests
             new() { Name = "Ethereum", Symbol = "eth" }
         };
 
-        _mockCoinService.Setup(s => s.GetTopCoinsAsync(It.IsAny<CancellationToken>()))
+        _mockCoinService.Setup(s => s.GetTopCoinsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(fakeCoins);
 
         await _viewModel.LoadData();
@@ -78,7 +78,7 @@ public class MainViewModelTests
             new() { Name = "Ethereum", Symbol = "eth" }
         };
 
-        _mockCoinService.Setup(s => s.GetTopCoinsAsync(It.IsAny<CancellationToken>()))
+        _mockCoinService.Setup(s => s.GetTopCoinsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(fakeCoins);
 
         await _viewModel.LoadData();
@@ -94,7 +94,7 @@ public class MainViewModelTests
     public void OpenDetails_ShouldCallNavigationService()
     {
         var coinModel = new Coin { Id = "btc", Name = "Bitcoin" };
-        var coinVm = new CoinViewModel(coinModel);
+        var coinVm = new CoinViewModel(coinModel, "$");
 
         _viewModel.OpenDetails(coinVm);
 

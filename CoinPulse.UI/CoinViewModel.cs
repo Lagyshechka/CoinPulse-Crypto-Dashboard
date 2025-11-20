@@ -13,6 +13,8 @@ public class CoinViewModel : ObservableObject
 {
     public Coin Model { get; }
     
+    public string CurrencySymbol { get; }
+    
     public string Name => Model.Name;
     public string Symbol => Model.Symbol.ToUpper();
     public string ImageUrl => Model.ImageUrl;
@@ -49,9 +51,10 @@ public class CoinViewModel : ObservableObject
     public Axis[] XAxes { get; }
     public Axis[] YAxes { get; }
     
-    public CoinViewModel(Coin coin)
+    public CoinViewModel(Coin coin, string currencySymbol = "$")
     {
         Model = coin;
+        CurrencySymbol = currencySymbol;
 
         var skColor = PriceChangePercentage24H >= 0
             ? SKColor.Parse("#4CAF50")
